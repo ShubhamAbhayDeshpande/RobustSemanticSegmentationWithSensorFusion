@@ -1,0 +1,13 @@
+# Yaml file for specifing the inference arguments. 
+
+RGB img folder: "/home/deshpand/noadsm/datasets/Uni-dataset/002/rgb"
+NIR img folder: "/home/deshpand/noadsm/datasets/Uni-dataset/002/nir"
+
+img size: 512
+img mode: "RGB"
+
+output folder: "./inference"
+
+model path: "Models/Uni_dataset_rgb_nir_512x512_512.pt"
+
+experiment name: "Uni_dataset_512x512_fusion_inference"

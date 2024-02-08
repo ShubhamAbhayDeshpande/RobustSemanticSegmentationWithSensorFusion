@@ -6,9 +6,11 @@ import numpy as np
 import torch
 from PIL import Image
 from torch.autograd import Variable
-#from torch.utils.serialization import load_lua
+
+# from torch.utils.serialization import load_lua
 from args_fusion import args
-#from scipy.misc import imread, imsave, imresize
+
+# from scipy.misc import imread, imsave, imresize
 import matplotlib as mpl
 import cv2
 from torchvision import datasets, transforms
@@ -22,21 +24,21 @@ def list_images(directory):
     dir.sort()
     for file in dir:
         name = file.lower()
-        if name.endswith('.png'):
+        if name.endswith(".png"):
             images.append(join(directory, file))
-        elif name.endswith('.jpg'):
+        elif name.endswith(".jpg"):
             images.append(join(directory, file))
-        elif name.endswith('.jpeg'):
+        elif name.endswith(".jpeg"):
             images.append(join(directory, file))
-        elif name.endswith('.tif'):
+        elif name.endswith(".tif"):
             images.append(join(directory, file))
-        name1 = name.split('.')
+        name1 = name.split(".")
         names.append(name1[0])
     return images
 
 
 def tensor_load_rgbimage(filename, size=None, scale=None, keep_asp=False):
-    img = Image.open(filename).convert('RGB')
+    img = Image.open(filename).convert("RGB")
     if size is not None:
         if keep_asp:
             size2 = int(size * 1.0 / img.size[0] * img.size[1])
@@ -45,7 +47,9 @@ def tensor_load_rgbimage(filename, size=None, scale=None, keep_asp=False):
             img = img.resize((size, size), Image.ANTIALIAS)
 
     elif scale is not None:
-        img = img.resize((int(img.size[0] / scale), int(img.size[1] / scale)), Image.ANTIALIAS)
+        img = img.resize(
+            (int(img.size[0] / scale), int(img.size[1] / scale)), Image.ANTIALIAS
+        )
     img = np.array(img).transpose(2, 0, 1)
     img = torch.from_numpy(img).float()
     return img
@@ -58,7 +62,7 @@ def tensor_save_rgbimage(tensor, filename, cuda=True):
     else:
         # img = tensor.clone().clamp(0, 255).numpy()
         img = tensor.clamp(0, 255).numpy()
-    img = img.transpose(1, 2, 0).astype('uint8')
+    img = img.transpose(1, 2, 0).astype("uint8")
     img = Image.fromarray(img)
     img.save(filename)
 
@@ -78,7 +82,7 @@ def gram_matrix(y):
 
 
 def matSqrt(x):
-    U,D,V = torch.svd(x)
+    U, D, V = torch.svd(x)
     return U * (D.pow(0.5).diag()) * V.t()
 
 
@@ -90,46 +94,48 @@ def load_dataset(image_path, BATCH_SIZE, num_imgs=None):
     # random
     random.shuffle(original_imgs_path)
     mod = num_imgs % BATCH_SIZE
-    print('BATCH SIZE %d.' % BATCH_SIZE)
-    print('Train images number %d.' % num_imgs)
-    print('Train images samples %s.' % str(num_imgs / BATCH_SIZE))
+    print("BATCH SIZE %d." % BATCH_SIZE)
+    print("Train images number %d." % num_imgs)
+    print("Train images samples %s." % str(num_imgs / BATCH_SIZE))
 
     if mod > 0:
-        print('Train set has been trimmed %d samples...\n' % mod)
+        print("Train set has been trimmed %d samples...\n" % mod)
         original_imgs_path = original_imgs_path[:-mod]
     batches = int(len(original_imgs_path) // BATCH_SIZE)
     return original_imgs_path, batches
 
 
-def get_train_image(path, height=256, width=256, mode='L'):
+def get_train_image(path, height=256, width=256, mode="L"):
     """
-    The naming in this code makes it so that, it will run either with train or test code. 
+    The naming in this code makes it so that, it will run either with train or test code.
     We need to make the naming so that, it will be able to run without any changes for both train and the test.
-    
+
     """
-    if mode == 'L':
-        #image = imread(path, mode=mode) # Change this to read gray scale image with PIL library.
-        #image = Image.open(path).convert('L')
-        image = Image.open(path).convert('L')
-        #image= np.asarray(image)
-    elif mode == 'RGB':
-        #image = Image.open(path).convert('RGB')
-        image = Image.open(path).convert('RGB')
-        #image = np.asarray(image)
+    if mode == "L":
+        # image = imread(path, mode=mode) # Change this to read gray scale image with PIL library.
+        # image = Image.open(path).convert('L')
+        image = Image.open(path).convert("L")
+        # image= np.asarray(image)
+    elif mode == "RGB":
+        # image = Image.open(path).convert('RGB')
+        image = Image.open(path).convert("RGB")
+        # image = np.asarray(image)
 
     if height is not None and width is not None:
-        #image = imresize(image, [height, width], interp='nearest')
-        image = np.asarray(image.resize((width, height), resample=Image.Resampling.NEAREST))
+        # image = imresize(image, [height, width], interp='nearest')
+        image = np.asarray(
+            image.resize((width, height), resample=Image.Resampling.NEAREST)
+        )
     return image
 
 
-def get_train_images_auto(paths, height=256, width=256, mode='RGB'):
+def get_train_images_auto(paths, height=256, width=256, mode="RGB"):
     if isinstance(paths, str):
         paths = [paths]
     images = []
     for path in paths:
         image = get_train_image(path, height, width, mode=mode)
-        if mode == 'L':
+        if mode == "L":
             image = np.reshape(image, [1, image.shape[0], image.shape[1]])
         else:
             image = np.reshape(image, [image.shape[2], image.shape[0], image.shape[1]])
@@ -139,32 +145,36 @@ def get_train_images_auto(paths, height=256, width=256, mode='RGB'):
     images = torch.from_numpy(images).float()
     return images
 
-def load_test_images(path, height=256, width=256, mode='L'):
-    if mode == 'L':
-        image = Image.open(path).convert('L')
-        image= np.asarray(image)
 
-    elif mode == 'RGB':
-        image = Image.open(path).convert('RGB')
+def load_test_images(path, height=256, width=256, mode="L"):
+    if mode == "L":
+        image = Image.open(path).convert("L")
+        image = np.asarray(image)
+
+    elif mode == "RGB":
+        image = Image.open(path).convert("RGB")
         image = np.asarray(image)
 
     if height is not None and width is not None:
-        image = np.asarray(image.resize((width, height), resample=Image.Resampling.NEAREST))
+        image = np.asarray(
+            image.resize((width, height), resample=Image.Resampling.NEAREST)
+        )
     return image
 
-def get_test_images(paths, height=None, width=None, mode='L'):
+
+def get_test_images(paths, height=None, width=None, mode="L"):
     ImageToTensor = transforms.Compose([transforms.ToTensor()])
     if isinstance(paths, str):
         paths = [paths]
     images = []
     for path in paths:
         image = load_test_images(path, height, width, mode=mode)
-        if mode == 'L':
+        if mode == "L":
             image = np.reshape(image, [1, image.shape[0], image.shape[1]])
         else:
             # test = ImageToTensor(image).numpy()
             # shape = ImageToTensor(image).size()
-            image = ImageToTensor(image).float().numpy()*255
+            image = ImageToTensor(image).float().numpy() * 255
     images.append(image)
     images = np.stack(images, axis=0)
     images = torch.from_numpy(images).float()
@@ -173,7 +183,9 @@ def get_test_images(paths, height=None, width=None, mode='L'):
 
 # colormap
 def colormap():
-    return mpl.colors.LinearSegmentedColormap.from_list('cmap', ['#FFFFFF', '#98F5FF', '#00FF00', '#FFFF00','#FF0000', '#8B0000'], 256)
+    return mpl.colors.LinearSegmentedColormap.from_list(
+        "cmap", ["#FFFFFF", "#98F5FF", "#00FF00", "#FFFF00", "#FF0000", "#8B0000"], 256
+    )
 
 
 def save_images(path, data):
@@ -191,9 +203,10 @@ def save_images(path, data):
 
     if data.shape[2] == 1:
         data = data.reshape([data.shape[0], data.shape[1]])
-    #imsave(path, data)  # Change this to use similar function in PIL.
-    cv2.imwrite(path, data)  # Change the 'image.png' to some actual name of the image. Preferrably proper real name.
-    
+    # imsave(path, data)  # Change this to use similar function in PIL.
+    cv2.imwrite(
+        path, data
+    )  # Change the 'image.png' to some actual name of the image. Preferrably proper real name.
 
     # for i, path in enumerate(paths):
     #     data = datas[i]
@@ -212,19 +225,23 @@ def save_images(path, data):
     #     # new_im.show()
     #
     #     imsave(path, data)
+
+
 def gradient_gray(image):
     """
     New gradient loss. Loss calculated between the original and reconstrcted image.
     This gunction will be executed if the image is gray.
 
     :param image: Gray image as an array
-    :return: Image gradient vector        
+    :return: Image gradient vector
     """
-    conv_op = nn.Conv2d(1,1,3, bias = False, padding =0) # 2D covolution with input channel 1, output channel 1, kernel of 3x3 and the stride 1.
+    conv_op = nn.Conv2d(
+        1, 1, 3, bias=False, padding=0
+    )  # 2D covolution with input channel 1, output channel 1, kernel of 3x3 and the stride 1.
 
     # Define the kernel which will be used for calculating gradient. This is a discrete Laplacian kernel used for calculating the gradient in an image. Refer OpenCV documentation or 2D Notes.
     # We can change this kernel and see how the loss value differes in the future.
-    kernel = np.array([[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]], dtype='float32') 
+    kernel = np.array([[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]], dtype="float32")
 
     # Reshape the kernel to make it work.
     kernel = kernel.reshape((1, 1, 3, 3))
@@ -237,20 +254,21 @@ def gradient_gray(image):
 
     return edge_detect
 
+
 # def gradient_rgb(image):
 #     """
 #     New gradient loss. Loss calculated between the original and reconstrcted image.
 #     This gunction will be executed if the image is rgb.
 
 #     :param image: RGB image as an array
-#     :return: Image gradient vector      
+#     :return: Image gradient vector
 #     """
 
 #     conv_op = nn.Conv2d(3,3,3, bias = False, padding =0) # 2D covolution with input channel 1, output channel 1, kernel of 3x3 and the stride 1.
 
 #     # Define the kernel which will be used for calculating gradient. This is a discrete Laplacian kernel used for calculating the gradient in an image. Refer OpenCV documentation or 2D Notes.
 #     # We can change this kernel and see how the loss value differes in the future.
-#     kernel = np.array([[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]], dtype='float32') 
+#     kernel = np.array([[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]], dtype='float32')
 
 #     # Reshape the kernel to make it work.
 #     kernel = kernel.reshape((1, 1, 3, 3))

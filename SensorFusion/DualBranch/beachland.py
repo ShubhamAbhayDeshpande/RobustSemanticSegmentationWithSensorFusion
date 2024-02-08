@@ -1,6 +1,7 @@
 import pynvml
 import numpy as np
 import time
+
 pynvml.nvmlInit()
 handles = []
 # 这里的0是GPU id
@@ -10,17 +11,20 @@ for i in range(4):
 memInfos = []
 for handle in handles:
     memInfos.append(pynvml.nvmlDeviceGetMemoryInfo(handle))
-commandList = ['',
-               '',
-               '',]
+commandList = [
+    "",
+    "",
+    "",
+]
 commandFalg = np.ones(len(commandList))
+
 
 def getUsedRate(memInfo):
     return memInfo.used / memInfo.total
 
 
 def sendCommand(deviceID):
-    print(str(deviceID) + ': command')
+    print(str(deviceID) + ": command")
 
 
 setRate = 0.2
@@ -30,21 +34,20 @@ while True:
     print("===============")
     min_use = 100
     ID = 0
-    can_ues=[]
+    can_ues = []
     for memInfo in memInfos:
-        num = num+1
-        min_use = min(min_use, getUsedRate(memInfo)*100)
+        num = num + 1
+        min_use = min(min_use, getUsedRate(memInfo) * 100)
         ID = num
-        print(num, int(getUsedRate(memInfo)*100), "%")
-        if min_use<10:
+        print(num, int(getUsedRate(memInfo) * 100), "%")
+        if min_use < 10:
             break
-    if min_use>50:
-        print('显卡全特么被占啦！！！')
+    if min_use > 50:
+        print("显卡全特么被占啦！！！")
     else:
-        print('找到空的了！！！', ID,min_use)
+        print("找到空的了！！！", ID, min_use)
         sendCommand(num)
     print("===============")
-
 
     time.sleep(1)
 

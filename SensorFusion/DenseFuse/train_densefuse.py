@@ -37,7 +37,7 @@ def main():
         original_imgs_path_combined, len(original_imgs_path_combined)
     )
 
-    i = 5#0#5#0
+    i = 5  # 0#5#0
     train(i, original_imgs_path)
 
 

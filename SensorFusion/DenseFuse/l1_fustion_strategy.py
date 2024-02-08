@@ -7,6 +7,7 @@ Import this file into testing module to use.
 
 import torch
 
+
 def L1_norm(source_en_a, source_en_b):
     result = []
 
@@ -22,11 +23,16 @@ def L1_norm(source_en_a, source_en_b):
     array_MASK_a = mask_sign_a
     array_MASK_b = mask_sign_b
 
-    dimension = source_en_a.shape  # Here the assumption is that, the shapes of the matrix a and b are the same.
+    dimension = (
+        source_en_a.shape
+    )  # Here the assumption is that, the shapes of the matrix a and b are the same.
     assert source_en_a.shape == source_en_b.shape
 
     for i in range(dimension[3]):
-        temp_matrix = array_MASK_a * source_en_a[0, :, :, i] + array_MASK_b * source_en_b[0, :, :, i]
+        temp_matrix = (
+            array_MASK_a * source_en_a[0, :, :, i]
+            + array_MASK_b * source_en_b[0, :, :, i]
+        )
         result.append(temp_matrix)
 
     result = torch.stack(result, dim=1)

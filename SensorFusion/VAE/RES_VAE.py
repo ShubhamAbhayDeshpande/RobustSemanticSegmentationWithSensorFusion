@@ -10,12 +10,18 @@ class ResDown(nn.Module):
 
     def __init__(self, channel_in, channel_out, kernel_size=3):
         super(ResDown, self).__init__()
-        self.conv1 = nn.Conv2d(channel_in, channel_out // 2, kernel_size, 2, kernel_size // 2)
+        self.conv1 = nn.Conv2d(
+            channel_in, channel_out // 2, kernel_size, 2, kernel_size // 2
+        )
         self.bn1 = nn.BatchNorm2d(channel_out // 2, eps=1e-4)
-        self.conv2 = nn.Conv2d(channel_out // 2, channel_out, kernel_size, 1, kernel_size // 2)
+        self.conv2 = nn.Conv2d(
+            channel_out // 2, channel_out, kernel_size, 1, kernel_size // 2
+        )
         self.bn2 = nn.BatchNorm2d(channel_out, eps=1e-4)
 
-        self.conv3 = nn.Conv2d(channel_in, channel_out, kernel_size, 2, kernel_size // 2)
+        self.conv3 = nn.Conv2d(
+            channel_in, channel_out, kernel_size, 2, kernel_size // 2
+        )
 
         self.act_fnc = nn.ELU()
 
@@ -34,12 +40,18 @@ class ResUp(nn.Module):
     def __init__(self, channel_in, channel_out, kernel_size=3, scale_factor=2):
         super(ResUp, self).__init__()
 
-        self.conv1 = nn.Conv2d(channel_in, channel_in // 2, kernel_size, 1, kernel_size // 2)
+        self.conv1 = nn.Conv2d(
+            channel_in, channel_in // 2, kernel_size, 1, kernel_size // 2
+        )
         self.bn1 = nn.BatchNorm2d(channel_in // 2, eps=1e-4)
-        self.conv2 = nn.Conv2d(channel_in // 2, channel_out, kernel_size, 1, kernel_size // 2)
+        self.conv2 = nn.Conv2d(
+            channel_in // 2, channel_out, kernel_size, 1, kernel_size // 2
+        )
         self.bn2 = nn.BatchNorm2d(channel_out, eps=1e-4)
 
-        self.conv3 = nn.Conv2d(channel_in, channel_out, kernel_size, 1, kernel_size // 2)
+        self.conv3 = nn.Conv2d(
+            channel_in, channel_out, kernel_size, 1, kernel_size // 2
+        )
 
         self.up_nn = nn.Upsample(scale_factor=scale_factor, mode="nearest")
 
@@ -64,6 +76,7 @@ class Encoder(nn.Module):
     When in .eval() the Encoder will not sample from the distribution and will instead output mu as the encoding vector
     and log_var will be None
     """
+
     def __init__(self, channels, ch=64, latent_channels=512):
         super(Encoder, self).__init__()
         self.conv_in = nn.Conv2d(channels, ch, 7, 1, 3)
@@ -76,10 +89,10 @@ class Encoder(nn.Module):
         self.act_fnc = nn.ELU()
 
     def sample(self, mu, log_var):
-        std = torch.exp(0.5*log_var)
+        std = torch.exp(0.5 * log_var)
         eps = torch.randn_like(std)
-        return mu + eps*std
-        
+        return mu + eps * std
+
     def forward(self, x):
         x = self.act_fnc(self.conv_in(x))
         x = self.res_down_block1(x)  # 32
@@ -121,13 +134,14 @@ class Decoder(nn.Module):
         x = self.res_up_block4(x)  # 64
         x = torch.tanh(self.conv_out(x))
 
-        return x 
+        return x
 
 
 class VAE(nn.Module):
     """
     VAE network, uses the above encoder and decoder blocks
     """
+
     def __init__(self, channel_in=3, ch=64, latent_channels=512):
         super(VAE, self).__init__()
         """Res VAE Network
@@ -135,7 +149,7 @@ class VAE(nn.Module):
         z = the number of channels of the latent representation
         (for a 64x64 image this is the size of the latent vector)
         """
-        
+
         self.encoder = Encoder(channel_in, ch=ch, latent_channels=latent_channels)
         self.decoder = Decoder(channel_in, ch=ch, latent_channels=latent_channels)
 

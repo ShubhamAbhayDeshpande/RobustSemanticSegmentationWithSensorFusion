@@ -4,13 +4,12 @@ import torchvision.models.vgg as vgg
 from torch import nn
 
 
-LossOutput = namedtuple(
-    "LossOutput", ["relu1", "relu2", "relu3", "relu4", "relu5"])
+LossOutput = namedtuple("LossOutput", ["relu1", "relu2", "relu3", "relu4", "relu5"])
 
 
 class LossNetwork(torch.nn.Module):
     """Reference:
-        https://discuss.pytorch.org/t/how-to-extract-features-of-an-image-from-a-trained-model/119/3
+    https://discuss.pytorch.org/t/how-to-extract-features-of-an-image-from-a-trained-model/119/3
     """
 
     def __init__(self):
@@ -20,11 +19,11 @@ class LossNetwork(torch.nn.Module):
 
         self.vgg_layers = vggn.features
         self.layer_name_mapping = {
-            '3': "relu1",
-            '8': "relu2",
-            '17': "relu3",
-            '26': "relu4",
-            '35': "relu5",
+            "3": "relu1",
+            "8": "relu2",
+            "17": "relu3",
+            "26": "relu4",
+            "35": "relu5",
         }
 
     def forward(self, x):

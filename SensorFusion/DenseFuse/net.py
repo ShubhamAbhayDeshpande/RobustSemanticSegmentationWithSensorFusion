@@ -15,6 +15,7 @@ class ConvLayer(torch.nn.Module):
     It uses simple 2d convolution followed by a relu operation.
     In this example, the dropout layer is commented out. But It can be activated later
     """
+
     def __init__(self, in_channels, out_channels, kernel_size, stride, is_last=False):
         super(ConvLayer, self).__init__()
         reflection_padding = int(np.floor(kernel_size / 2))
@@ -24,7 +25,9 @@ class ConvLayer(torch.nn.Module):
         self.is_last = is_last
 
     def forward(self, x):
-        out = self.reflection_pad(x)  # Pad the tensor using reflection of the input boundary
+        out = self.reflection_pad(
+            x
+        )  # Pad the tensor using reflection of the input boundary
         out = self.conv2d(out)
         if self.is_last is False:
             # out = F.normalize(out)
@@ -36,9 +39,10 @@ class ConvLayer(torch.nn.Module):
 # Dense convolution unit
 class DenseConv2d(torch.nn.Module):
     """
-    This uses the convolution from the layer above and it will concatenate the output of each layer with 
+    This uses the convolution from the layer above and it will concatenate the output of each layer with
     original input. This is done so that each layer receives output from the previous layer.
     """
+
     def __init__(self, in_channels, out_channels, kernel_size, stride):
         super(DenseConv2d, self).__init__()
         self.dense_conv = ConvLayer(in_channels, out_channels, kernel_size, stride)
@@ -55,13 +59,23 @@ class DenseBlock(torch.nn.Module):
     This is the actual dense block. It is just a buch of DenseConv2d layers stacked together. On top of each
     other.
     """
+
     def __init__(self, in_channels, kernel_size, stride):
         super(DenseBlock, self).__init__()
         out_channels_def = 16
         denseblock = []
-        denseblock += [DenseConv2d(in_channels, out_channels_def, kernel_size, stride),
-                       DenseConv2d(in_channels+out_channels_def, out_channels_def, kernel_size, stride),
-                       DenseConv2d(in_channels+out_channels_def*2, out_channels_def, kernel_size, stride)]
+        denseblock += [
+            DenseConv2d(in_channels, out_channels_def, kernel_size, stride),
+            DenseConv2d(
+                in_channels + out_channels_def, out_channels_def, kernel_size, stride
+            ),
+            DenseConv2d(
+                in_channels + out_channels_def * 2,
+                out_channels_def,
+                kernel_size,
+                stride,
+            ),
+        ]
         self.denseblock = nn.Sequential(*denseblock)
 
     def forward(self, x):
@@ -104,21 +118,23 @@ class DenseFuse_net(nn.Module):
     #     f_0 = fusion_function(en1[0], en2[0])
     #     return [f_0]
 
-    def fusion(self, en1, en2, strategy_type='addition'):
+    def fusion(self, en1, en2, strategy_type="addition"):
         """
-        Method to apply different fusion strategies. 
+        Method to apply different fusion strategies.
         """
         if strategy_type == "addition":
-            f_0 = (en1[0] + en2[0])/2
+            f_0 = (en1[0] + en2[0]) / 2
             return [f_0]
-        
+
         elif strategy_type == "attention_weight":
             f_0 = fusion_strategy.attention_fusion_weight(en1[0], en2[0])
             return f_0
-        
+
         else:
-            raise ValueError(f"{strategy_type} is not a standard fusion strategy. Please check your input.")
-        
+            raise ValueError(
+                f"{strategy_type} is not a standard fusion strategy. Please check your input."
+            )
+
     # For the autoencoder code, the input to the decoder will need to change.
     def decoder(self, f_en):
         x2 = self.conv2(f_en[0])

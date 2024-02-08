@@ -77,7 +77,7 @@ def run_demo(
     if args.cuda:
         ir_img = ir_img.cuda()
         vis_img = vis_img.cuda()
-        
+
     ir_img = Variable(
         ir_img, requires_grad=False
     )  # create a tensor which cannot have gradients
@@ -155,7 +155,7 @@ def main():
         "attention_weight",
     ]  # addition, attention_weight, attention_enhance, adain_fusion, channel_fusion, saliency_mask
 
-    # Store the output in the following location. If the folder already does not exists, create one. 
+    # Store the output in the following location. If the folder already does not exists, create one.
     output_path = args.output_path
     os.makedirs(output_path, exist_ok=True)
     strategy_type = strategy_type_list[0]  # strategy_type_list[0]
@@ -208,7 +208,7 @@ def main():
                 ssim_weight_str=ssim_weight_str,
                 mode=mode,
             )
-            counter+=1
+            counter += 1
             print(counter)
 
         # for i in range(1):

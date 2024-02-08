@@ -18,13 +18,14 @@ import random
 
 # Ignore warnings
 import warnings
+
 warnings.filterwarnings("ignore")
 
 
 class ForestDataset_RGB(Dataset):
     """
     Class for loading only the RGB images in the training or inference model.
-    
+
     """
 
     def __init__(self, folder_path, transforms):
@@ -33,17 +34,18 @@ class ForestDataset_RGB(Dataset):
         self.img_lst = []
 
         for files in os.listdir(self.folder_path):
-            if os.path.isfile(os.path.join(self.folder_path, files)) and not files.startswith("."):
+            if os.path.isfile(
+                os.path.join(self.folder_path, files)
+            ) and not files.startswith("."):
                 self.img_lst.append(os.path.join(self.folder_path, files))
 
         random.shuffle(self.img_lst)
 
     def __len__(self):
         return len(self.img_lst)
-    
-    def __getitem__(self, index):
 
-         # Get rgb image path
+    def __getitem__(self, index):
+        # Get rgb image path
         rgb_img_path = self.img_lst[index]
 
         # Get image name
@@ -56,23 +58,22 @@ class ForestDataset_RGB(Dataset):
         # Read images
         rgb_img = Image.open(rgb_img_path).convert("RGB")
 
-        
         # Check and apply for transforms
         if self.transforms:
             rgb_img = self.transforms(rgb_img)
 
         sample = {"rgb_img": rgb_img}
-        
+
         return sample
 
-        
+
 class ForestDataset_RGB_NIR(Dataset):
     """
     Class for loading the freiburg forest images
-    
+
     """
+
     def __init__(self, folder_nir_path, folder_rgb_path, read_mode, transforms):
-        
         self.folder_rgb_path = folder_rgb_path
         self.folder_nir_path = folder_nir_path
         self.read_mode = read_mode
@@ -82,7 +83,9 @@ class ForestDataset_RGB_NIR(Dataset):
 
         # Check for all the files in the rgb and nir image folders.
         for files in os.listdir(self.folder_rgb_path):
-            if os.path.isfile(os.path.join(self.folder_rgb_path, files)) and not files.startswith("."):
+            if os.path.isfile(
+                os.path.join(self.folder_rgb_path, files)
+            ) and not files.startswith("."):
                 self.rgb_img_list.append(os.path.join(self.folder_rgb_path, files))
                 self.nir_img_list.append(os.path.join(self.folder_nir_path, files))
 
@@ -96,12 +99,11 @@ class ForestDataset_RGB_NIR(Dataset):
         return len(self.final_list)
 
     def __getitem__(self, index):
-        
         img_path = self.final_list[index]
 
         if not os.path.isfile(img_path):
             raise FileExistsError(f"No file named {img_path}")
-        
+
         if self.read_mode == "RGB":
             img = Image.open(img_path).convert("RGB")
 
@@ -109,13 +111,15 @@ class ForestDataset_RGB_NIR(Dataset):
             img = Image.open(img_path).convert("L")
 
         else:
-            raise ValueError(f"{self.read_mode} is not a valid value for the argument 'read_mode'.")
-        
+            raise ValueError(
+                f"{self.read_mode} is not a valid value for the argument 'read_mode'."
+            )
+
         # Check if transforms are applicable and apply them
         if self.transforms:
             img = self.transforms(img)
 
-        sample = {'img': (img).float()}
+        sample = {"img": (img).float()}
 
         return sample
 
@@ -123,10 +127,10 @@ class ForestDataset_RGB_NIR(Dataset):
 class InferenceDataset_RGB_NIR(Dataset):
     """
     Class for loading the freiburg forest images
-    
+
     """
+
     def __init__(self, folder_nir_path, folder_rgb_path, read_mode, transforms):
-        
         self.folder_rgb_path = folder_rgb_path
         self.folder_nir_path = folder_nir_path
         self.read_mode = read_mode
@@ -136,7 +140,9 @@ class InferenceDataset_RGB_NIR(Dataset):
 
         # Check for all the files in the rgb and nir image folders.
         for files in os.listdir(self.folder_rgb_path):
-            if os.path.isfile(os.path.join(self.folder_rgb_path, files)) and not files.startswith("."):
+            if os.path.isfile(
+                os.path.join(self.folder_rgb_path, files)
+            ) and not files.startswith("."):
                 self.rgb_img_list.append(os.path.join(self.folder_rgb_path, files))
                 self.nir_img_list.append(os.path.join(self.folder_nir_path, files))
 
@@ -145,9 +151,8 @@ class InferenceDataset_RGB_NIR(Dataset):
 
     def __len__(self):
         return len(self.rgb_img_list)
-    
+
     def __getitem__(self, index):
-        
         # Get rgb image path
         rgb_img_path = self.rgb_img_list[index]
 
@@ -169,14 +174,15 @@ class InferenceDataset_RGB_NIR(Dataset):
             nir_img = Image.open(nir_img_path).convert("L")
 
         else:
-            raise ValueError(f"{self.read_mode} is not a valid value for the argument 'read_mode'.")
-        
+            raise ValueError(
+                f"{self.read_mode} is not a valid value for the argument 'read_mode'."
+            )
+
         # Check and apply for transforms
         if self.transforms:
             rgb_img = self.transforms(rgb_img)
             nir_img = self.transforms(nir_img)
 
-        sample = {"rgb_img": rgb_img,
-                  "nir_img": nir_img}
-        
+        sample = {"rgb_img": rgb_img, "nir_img": nir_img}
+
         return sample

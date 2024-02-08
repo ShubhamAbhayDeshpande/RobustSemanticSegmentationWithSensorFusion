@@ -55,18 +55,32 @@ parser.add_argument(
     required=False,
 )
 parser.add_argument(
-    "--save_dir", "-sd", help="Root dir for saving model and data", type=str, default="."
+    "--save_dir",
+    "-sd",
+    help="Root dir for saving model and data",
+    type=str,
+    default=".",
 )
 
 # int args
 parser.add_argument("--nepoch", help="Number of training epochs", type=int, default=50)
-parser.add_argument("--batch_size", "-bs", help="Training batch size", type=int, default=1)
-parser.add_argument("--image_size", "-ims", help="Input image size", type=int, default=512)
-parser.add_argument("--ch_multi", "-w", help="Channel width multiplier", type=int, default=128)
+parser.add_argument(
+    "--batch_size", "-bs", help="Training batch size", type=int, default=1
+)
+parser.add_argument(
+    "--image_size", "-ims", help="Input image size", type=int, default=512
+)
+parser.add_argument(
+    "--ch_multi", "-w", help="Channel width multiplier", type=int, default=128
+)
 
 parser.add_argument("--device_index", help="GPU device index", type=int, default=0)
 parser.add_argument(
-    "--latent_channels", "-lc", help="Number of channels of the latent space", type=int, default=256
+    "--latent_channels",
+    "-lc",
+    help="Number of channels of the latent space",
+    type=int,
+    default=256,
 )
 parser.add_argument(
     "--save_interval", "-si", help="Number of iteration per save", type=int, default=256
@@ -74,11 +88,15 @@ parser.add_argument(
 
 # float args
 parser.add_argument("--lr", help="Learning rate", type=float, default=1e-4)
-parser.add_argument("--feature_scale", "-fs", help="Feature loss scale", type=float, default=1)
+parser.add_argument(
+    "--feature_scale", "-fs", help="Feature loss scale", type=float, default=1
+)
 parser.add_argument("--kl_scale", "-ks", help="KL penalty scale", type=float, default=1)
 
 # bool args
-parser.add_argument("--load_checkpoint", "-cp", action="store_true", help="Load from checkpoint")
+parser.add_argument(
+    "--load_checkpoint", "-cp", action="store_true", help="Load from checkpoint"
+)
 
 args = parser.parse_args()
 
@@ -119,10 +137,14 @@ test_split = 0.9
 n_train_examples = int(len(data_set) * test_split)
 n_test_examples = len(data_set) - n_train_examples
 train_set, test_set = torch.utils.data.random_split(
-    data_set, [n_train_examples, n_test_examples], generator=torch.Generator().manual_seed(42)
+    data_set,
+    [n_train_examples, n_test_examples],
+    generator=torch.Generator().manual_seed(42),
 )
 
-train_loader = DataLoader(train_set, batch_size=args.batch_size, shuffle=True, num_workers=4)
+train_loader = DataLoader(
+    train_set, batch_size=args.batch_size, shuffle=True, num_workers=4
+)
 test_loader = DataLoader(test_set, batch_size=args.batch_size, shuffle=False)
 
 # Get a test image batch from the test_loader to visualise the reconstruction quality etc
@@ -131,7 +153,9 @@ test_images = next(dataiter)  # dataiter.next()
 
 # Create AE network.
 vae_net = VAE(
-    channel_in=test_images["img"].shape[1], ch=args.ch_multi, latent_channels=args.latent_channels
+    channel_in=test_images["img"].shape[1],
+    ch=args.ch_multi,
+    latent_channels=args.latent_channels,
 ).to(device)
 
 # Setup optimizer
@@ -164,7 +188,9 @@ if not os.path.isdir(args.save_dir + "/Results"):
 # it does to prevent accidental overwriting. If no checkpoint exists, it starts from scratch.
 save_file_name = args.model_name + "_" + str(args.image_size)
 if args.load_checkpoint:
-    checkpoint = torch.load(args.save_dir + "/Models/" + save_file_name + ".pt", map_location="cpu")
+    checkpoint = torch.load(
+        args.save_dir + "/Models/" + save_file_name + ".pt", map_location="cpu"
+    )
     print("Checkpoint loaded")
     optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
     vae_net.load_state_dict(checkpoint["model_state_dict"])
@@ -253,7 +279,9 @@ for epoch in trange(start_epoch, args.nepoch, leave=False):
                         F.mse_loss(recon_img, test_images["img"].to(device)).item()
                     )
 
-                    img_cat = torch.cat((recon_img.cpu(), test_images["img"]), 2).float()
+                    img_cat = torch.cat(
+                        (recon_img.cpu(), test_images["img"]), 2
+                    ).float()
                     vutils.save_image(
                         img_cat,
                         "%s/%s/%s_%d_test.png"

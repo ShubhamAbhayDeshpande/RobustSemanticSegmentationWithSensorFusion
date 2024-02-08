@@ -2,26 +2,30 @@
 from activate_fuction import new
 import torch.nn as nn
 import torch
+
 Activate = new  # replace nn.LeakyReLU
+
 
 class Decoder(nn.Module):
     """
-    This class contains architecture for the decoder. 
-    
+    This class contains architecture for the decoder.
+
     """
+
     def __init__(self):
-        super(Decoder,self).__init__()
+        super(Decoder, self).__init__()
         self.layers = nn.Sequential()
-        self.layers.add_module('Conv2', nn.Conv2d(128,64,3,1,1))
-        self.layers.add_module('Act2' , Activate(inplace=True))
-        self.layers.add_module('Conv3', nn.Conv2d(64,32,3,1,1))
-        self.layers.add_module('Act3' , Activate(inplace=True))
-        self.layers.add_module('Conv4', nn.Conv2d(32,16,3,1,1))
-        self.layers.add_module('Act4' , Activate(inplace=True))
-        self.layers.add_module('Conv5', nn.Conv2d(16,1,3,1,1))
+        self.layers.add_module("Conv2", nn.Conv2d(128, 64, 3, 1, 1))
+        self.layers.add_module("Act2", Activate(inplace=True))
+        self.layers.add_module("Conv3", nn.Conv2d(64, 32, 3, 1, 1))
+        self.layers.add_module("Act3", Activate(inplace=True))
+        self.layers.add_module("Conv4", nn.Conv2d(32, 16, 3, 1, 1))
+        self.layers.add_module("Act4", Activate(inplace=True))
+        self.layers.add_module("Conv5", nn.Conv2d(16, 1, 3, 1, 1))
 
     def forward(self, x):
         return self.layers(x)
+
 
 class SELayer(nn.Module):
     def __init__(self, channel, reduction=8):
@@ -31,7 +35,7 @@ class SELayer(nn.Module):
             nn.Linear(channel, channel // reduction),
             nn.ReLU(inplace=True),
             nn.Linear(channel // reduction, channel),
-            nn.Sigmoid()
+            nn.Sigmoid(),
         )
 
     def forward(self, x):
@@ -40,33 +44,40 @@ class SELayer(nn.Module):
         y = self.fc(y).view(b, c, 1, 1)
         return x * y
 
+
 class Encoder(nn.Module):
     """
-    
+
     This class contains the architecture for the encoder.
-    
+
     """
+
     def __init__(self):
-        super(Encoder,self).__init__()
+        super(Encoder, self).__init__()
 
-        self.Conv1 = nn.Conv2d(1, 32, 3, 1, 1) # First convolution which will give 32 channel feature output. For more information read documentation of Conv2d().
-        self.Activate  = Activate(inplace=True) # New activation funcition whihc has replaced leaky-relu. Mish activation function.
-
+        self.Conv1 = nn.Conv2d(
+            1, 32, 3, 1, 1
+        )  # First convolution which will give 32 channel feature output. For more information read documentation of Conv2d().
+        self.Activate = Activate(
+            inplace=True
+        )  # New activation funcition whihc has replaced leaky-relu. Mish activation function.
 
         self.Conv_d = nn.Conv2d(32, 16, 3, 1, 1)
-        self.layers = nn.ModuleDict({
-            'DenseConv1': nn.Conv2d(16,16,3,1,1),
-            'DenseConv2': nn.Conv2d(32,16,3,1,1),
-            'DenseConv3': nn.Conv2d(48,16,3,1,1)
-        })
+        self.layers = nn.ModuleDict(
+            {
+                "DenseConv1": nn.Conv2d(16, 16, 3, 1, 1),
+                "DenseConv2": nn.Conv2d(32, 16, 3, 1, 1),
+                "DenseConv3": nn.Conv2d(48, 16, 3, 1, 1),
+            }
+        )
 
-        self.Conv2 = nn.Conv2d(32, 64, 3,2,1)
-        self.Conv3 = nn.Conv2d(64, 128, 3,2,1)
-        self.Conv4 = nn.Conv2d(128, 64, 3,2,1)
-        self.Upsample = nn.Upsample(scale_factor=8,mode='bilinear',align_corners=True)
+        self.Conv2 = nn.Conv2d(32, 64, 3, 2, 1)
+        self.Conv3 = nn.Conv2d(64, 128, 3, 2, 1)
+        self.Conv4 = nn.Conv2d(128, 64, 3, 2, 1)
+        self.Upsample = nn.Upsample(scale_factor=8, mode="bilinear", align_corners=True)
         # self.SELayer = SELayer(128,8)
 
-    def con(self,x,isTest = False):
+    def con(self, x, isTest=False):
         # print(x.shape)
         x = self.Activate(self.Conv1(x))
         x_d = self.Activate(self.Conv_d(x))
@@ -74,9 +85,9 @@ class Encoder(nn.Module):
         for i in range(len(self.layers)):
             """
             The for loop makes the detail branch of the encoder. Hence the output is 'x_d'.
-            
+
             """
-            out = self.Activate(self.layers['DenseConv' + str(i + 1)](x_d))
+            out = self.Activate(self.layers["DenseConv" + str(i + 1)](x_d))
             x_d = torch.cat([x_d, out], 1)
 
         # out = x
@@ -89,29 +100,32 @@ class Encoder(nn.Module):
         x_s = self.Activate(self.Conv4(x_s))
         x_s = self.Upsample(x_s)
 
-        if isTest: # Upsample for Test, The size of some pictures is not a power of 2
+        if isTest:  # Upsample for Test, The size of some pictures is not a power of 2
             # print('test')
-            test_upsample = nn.Upsample(size=(x.shape[2],x.shape[3]),mode='bilinear',align_corners=True)
+            test_upsample = nn.Upsample(
+                size=(x.shape[2], x.shape[3]), mode="bilinear", align_corners=True
+            )
             x_s = test_upsample(x_s)
 
-        out = torch.cat([x_d, x_s], 1) # Concatenate the outputs of the detail and semantic heads along columns. 
+        out = torch.cat(
+            [x_d, x_s], 1
+        )  # Concatenate the outputs of the detail and semantic heads along columns.
         # out = self.SELayer(out)
         return out
 
-    def forward(self, x,isTest=False):
-        x = self.con(x,isTest=isTest)
+    def forward(self, x, isTest=False):
+        x = self.con(x, isTest=isTest)
         return x
 
 
 class DenseFuseNet(nn.Module):
-    
     def __init__(self):
-        super(DenseFuseNet,self).__init__()
-        
+        super(DenseFuseNet, self).__init__()
+
         self.encoder = Encoder()
         self.decoder = Decoder()
-        
-    def forward(self,x,isTest=False,saveMat=False):
-        x = self.encoder(x,isTest=isTest)
+
+    def forward(self, x, isTest=False, saveMat=False):
+        x = self.encoder(x, isTest=isTest)
         out = self.decoder(x)
         return out

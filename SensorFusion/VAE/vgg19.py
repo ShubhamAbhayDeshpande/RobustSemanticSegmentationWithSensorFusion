@@ -4,8 +4,8 @@ import torch
 
 class VGG19(nn.Module):
     """
-     Simplified version of the VGG19 "feature" block
-     This module's only job is to return the "feature loss" for the inputs
+    Simplified version of the VGG19 "feature" block
+    This module's only job is to return the "feature loss" for the inputs
     """
 
     def __init__(self, channel_in=3, width=64):
@@ -39,13 +39,17 @@ class VGG19(nn.Module):
 
     def load_params_(self):
         # Download and load Pytorch's pre-trained weights
-        state_dict = torch.hub.load_state_dict_from_url('https://download.pytorch.org/models/vgg19-dcbb9e9d.pth')
-        for ((name, source_param), target_param) in zip(state_dict.items(), self.parameters()):
+        state_dict = torch.hub.load_state_dict_from_url(
+            "https://download.pytorch.org/models/vgg19-dcbb9e9d.pth"
+        )
+        for (name, source_param), target_param in zip(
+            state_dict.items(), self.parameters()
+        ):
             target_param.data = source_param.data
             target_param.requires_grad = False
 
     def feature_loss(self, x):
-        return (x[:x.shape[0] // 2] - x[x.shape[0] // 2:]).pow(2).mean()
+        return (x[: x.shape[0] // 2] - x[x.shape[0] // 2 :]).pow(2).mean()
 
     def forward(self, x):
         """
@@ -93,5 +97,4 @@ class VGG19(nn.Module):
         x = self.conv16(self.relu(x))
         loss += self.feature_loss(x)
 
-        return loss/16
-
+        return loss / 16

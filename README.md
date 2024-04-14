@@ -54,7 +54,7 @@ The RPTU-Forest dataset therefore consists of images captured with a Parrot Sequ
 
 The dataset was collected in the spring. An example of an annotated image is shown below.
 
-![Annotated Image Example](Images/annoated_image.pngannoated_image.png)
+![Annotated Image Example](Images/Annotated_Image_Example.png)
 
 <b>Annotated Image Example</b>
 

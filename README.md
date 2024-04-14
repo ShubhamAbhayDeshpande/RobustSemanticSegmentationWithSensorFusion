@@ -1,11 +1,6 @@
-# Master Thesis: Robust Semantic Segmentation with Fusion of RGB and NIR images
+# Robust Semantic Segmentation with Fusion of RGB and NIR images
 
-## Author
-[M.Sc. Shubham Abhay Deshpande](https://github.com/ShubhamAbhayDeshpande?tab=repositories)
-
-## Supervisor
-[M.Sc. Pankaj Deoli](https://github.com/deolipankaj)
-
+## Paper
 
 ## Abstract
 In recent years, significant progress has been made in autonomous mobility. However, this
@@ -38,7 +33,7 @@ fused images were compared with those from RGB images earlier.
 The implementation is done in the PyTorch and is given in this repository.
 
 ## Dataset
-The experiments in this thesis are performed on two datasets. 
+The experiments are performed on two datasets. 
 
 1. [Freiburg Forest Dataset](http://deepscene.cs.uni-freiburg.de)
 2. [RPTU Forest Dataset]()
@@ -49,7 +44,7 @@ The new dataset formed by these images is called RPTU-Forest dataset. The
 overall dataset comprises of 6 classes including obstacle, sky, trail, grass, vegetation and void (background). Particularly important to us, was the strong variations in
 illumination. An example of annotated images in the dataset is shown in the image below.
 
-![Sample Annotated Images](Images\Annotated_Image_Example.png)
+![Sample Annotated Images](Images/Annotated_Image_Example.png)
 
 <b>Sample Annotated Images</b>
 
@@ -59,7 +54,7 @@ The RPTU-Forest dataset therefore consists of images captured with a Parrot Sequ
 
 The dataset was collected in the spring. An example of an annotated image is shown below.
 
-![Annotated Image Example](Images/annoated_image.png)
+![Annotated Image Example](Images/annoated_image.pngannoated_image.png)
 
 <b>Annotated Image Example</b>
 
@@ -69,11 +64,11 @@ The part of the code is mainly divided into two parts.
 2. [Semantic Segmentation](SemanticSegmentation)
 
 For sensor fusion between two similar modalities (namely RGB and NIR image) there are multiple approaches which are tested. These approaches are:
-1. [DenseFusion](SensorFusion\DenseFuse)
-2. [Dual-Branch Fusion](SensorFusion\DualBranch)
-3. [Variational Autoencoders](SensorFusion\VAE)
+1. [DenseFusion](SensorFusion/DenseFuse)
+2. [Dual-Branch Fusion](SensorFusion/DualBranch)
+3. [Variational Autoencoders](SensorFusion/VAE)
 
-The goal of the thesis is to check if there is any improvement in the semantic segmentation if it is trained on the output of the sensor fusion model. It is hypothesized that, if the image resulting from the fusion of RGB and NIR images should have more features that are useful for the semantic segmentation task.
+The goal of the is to check if there is any improvement in the semantic segmentation if it is trained on the output of the sensor fusion model. It is hypothesized that, if the image resulting from the fusion of RGB and NIR images should have more features that are useful for the semantic segmentation task.
 
 ### Sensor Fusion
 These approaches have their own separate folders with the source code. In each folder, more information about how to run the code is given. 
@@ -104,8 +99,3 @@ The results and the validation dice scores for the U-Net model trained on only R
 ![RGB+NIR Image segmentation](Images/fused_segmentation.png)
 
 <b>Fused Image Segmentation Results</b>
-
-## Paper
-
-## Contact
-* deshpandeaa6@gmail.com

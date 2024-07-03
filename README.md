@@ -10,7 +10,7 @@ is only a little literature and datasets available for it. Moreover, off-road au
 mobility is more challenging because of various environments, illumination conditions, lack
 of fixed or specific standard features, etc.
 
-This thesis attempts to solve the problem of semantic segmentation for autonomous
+The aim is to solve the problem of semantic segmentation for autonomous
 vehicles working in off-road environments. To this end, after studying some available
 datasets, a new dataset called "RPTU-Forest Dataset" is created, containing RGB and NIR
 images and their respective segmentation maps. This dataset is specific to the navigation

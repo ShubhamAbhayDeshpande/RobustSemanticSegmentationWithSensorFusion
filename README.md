@@ -29,6 +29,8 @@ After selecting one fusion approach, the deep-learning model for semantic segmen
 was again trained and tested with fused images. The test results for segmentation with
 fused images were compared with those from RGB images earlier.
 
+[Network Architecture](Images/main_image.pngs)
+
 ## Code Base:
 The implementation is done in the PyTorch and is given in this repository.
 

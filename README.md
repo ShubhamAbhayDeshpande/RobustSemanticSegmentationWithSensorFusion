@@ -1,6 +1,7 @@
 # Robust Semantic Segmentation with Fusion of RGB and NIR images
 
 ## Paper
+https://ieeexplore.ieee.org/document/10597528
 
 ## Abstract
 In recent years, significant progress has been made in autonomous mobility. However, this
